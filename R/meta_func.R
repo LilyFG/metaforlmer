@@ -10,6 +10,17 @@
 #'
 #' @return Returns a dataframe for quick reference and a list of the full
 #'  meta-analysis outputs from \code{\link{metafor}}.
+#'
+#'  @examples
+#'  # arrange dataframes into list
+#'  data_list <- list(data1,data2,data3)
+#'
+#'  # run the same model over each dataframe using lapply
+#'  model_list <- lapply(data_list, function(data){
+#'                                                  lmer(formula = y ~ x + c + (1|s), data = data)
+#'                                                })
+#'  # run the meta-analysis over the list
+#'  meta <- meta_models(model_list)
 
 
 meta_models <- function(model_list){

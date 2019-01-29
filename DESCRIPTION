@@ -1,0 +1,14 @@
+Package: metaforlmer
+Type: Package
+Title: Functions for Applying Metafor to lmer and glmer models
+Version: 0.1.0
+Author: Lily FitzGibbon
+Maintainer: Lily FitzGibbon <l.t.fitzgibbon@reading.ac.uk>
+Description: Functions for running meta-analyses and plotting forest plots from LMER and GLMER models with multiple predictors.
+License: N/A
+Encoding: UTF-8
+LazyData: true
+Imports:
+  ggplot2,
+  metafor
+RoxygenNote: 6.1.1

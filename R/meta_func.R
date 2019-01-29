@@ -12,15 +12,21 @@
 #'  meta-analysis outputs from \code{\link{metafor}}.
 #'
 #'  @examples
-#'  # arrange dataframes into list
-#'  data_list <- list(data1,data2,data3)
+#'  # This example uses data from the mlbench package that's been split to create a list
+#'  library(mlbench)
+#'  data(BostonHousing)
+#'  data_list <- split(BostonHousing, BostonHousing$)
+#'
 #'
 #'  # run the same model over each dataframe using lapply
 #'  model_list <- lapply(data_list, function(data){
-#'                                                  lmer(formula = y ~ x + c + (1|s), data = data)
+#'                                                  lmer(formula = glucose ~ age + mass + (1|triceps), data = data)
 #'                                                })
 #'  # run the meta-analysis over the list
 #'  meta <- meta_models(model_list)
+#'
+#'  # use the ggforest function to plot the forest plot
+#'  ggforest(meta)
 
 
 meta_models <- function(model_list){
@@ -104,24 +110,26 @@ meta_models <- function(model_list){
 #'  meta-analysis outputs from \code{\link{metafor}}.
 
 ggforest <- function(x, intercept=F, labels = NULL, hetero = "none", palette = wesanderson::wes_palettes$Darjeeling1){
+  studies <- x$metas[[1]]$slab
+  x <- x$metas
   require("ggplot2")
   # Function to convert REM results in `rma`-format into a data.frame
   rma2df = function(x){
     df <- as.data.frame(data.table::rbindlist(lapply(x, function(x){
-    rbind(
-      data.frame(Study = "RE Model", LogFC = x$b, CILB=x$ci.lb, CIUB=x$ci.ub,
-                 p = x$pval, group = "Meta-\nanalysis",
-                 I2 = x$I2,
-                 Qp = x$QEp,
-                 stringsAsFactors = FALSE),
-      data.frame(Study = x$slab, LogFC = x$yi,
-                 CILB=x$yi - 2*sqrt(x$vi),
-                 CIUB=x$yi + 2*sqrt(x$vi),
-                 p = x$pval, group = "Experiments",
-                 I2 = NA,
-                 Qp = NA,
-                 stringsAsFactors = FALSE)
-    )})))
+      rbind(
+        data.frame(Study = "RE Model", LogFC = x$b, CILB=x$ci.lb, CIUB=x$ci.ub,
+                   p = x$pval, group = "Meta-\nanalysis",
+                   I2 = x$I2,
+                   Qp = x$QEp,
+                   stringsAsFactors = FALSE),
+        data.frame(Study = x$slab, LogFC = x$yi,
+                   CILB=x$yi - 2*sqrt(x$vi),
+                   CIUB=x$yi + 2*sqrt(x$vi),
+                   p = x$pval, group = "Experiments",
+                   I2 = NA,
+                   Qp = NA,
+                   stringsAsFactors = FALSE)
+      )})))
     df$predictor <- rep(names(x), each = nrow(df)/length(x))
     df
   }
